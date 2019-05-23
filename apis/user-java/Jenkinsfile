@@ -10,7 +10,7 @@ pipeline {
         CONTAINER_REG_CRED = credentials('acr-h2floh-principal')
         def REGISTRY_SERVER = 'h2floh.azurecr.io'
         def CONTAINER_IMAGE_NAME = 'test/abc'
-        def CONTAINER_IMAGE_LABEL = '${env.BUILD_ID}'
+        def CONTAINER_IMAGE_LABEL = ${env.BUILD_ID}
     }
     stages {
         stage('Build') { 
@@ -30,7 +30,7 @@ pipeline {
         }
         stage('DockerBuild') {
             steps {
-                sh 'cd apis/user-java/ && docker build .'
+                sh 'cd apis/user-java/ && docker build . -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL}'
             }
         }
         stage('DockerPush') {
