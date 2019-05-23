@@ -11,5 +11,15 @@ pipeline {
                 sh 'cd apis/user-java/ && mvn -B -DskipTests clean package' 
             }
         }
+        stage('Test') {
+            steps {
+                sh 'cd apis/user-java/ && mvn test'
+            }
+            post {
+                always {
+                    junit 'apis/user-java/target/surefire-reports/*.xml'
+                }
+            }
+        }
     }
 }
