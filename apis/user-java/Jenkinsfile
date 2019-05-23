@@ -21,5 +21,10 @@ pipeline {
                 }
             }
         }
+        stage('DockerBuild') {
+            steps {
+                sh 'cd apis/user-java/ && docker build'
+            }
+        }
     }
 }
