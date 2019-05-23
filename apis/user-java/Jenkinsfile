@@ -9,28 +9,34 @@ pipeline {
     environment {
         CONTAINER_REG_CRED = credentials('acr-h2floh-principal')
         def REGISTRY_SERVER = 'h2floh.azurecr.io'
-        def CONTAINER_IMAGE_NAME = 'test/abc'
+        def CONTAINER_IMAGE_NAME = 'devopsoh/api-user-java'
         def CONTAINER_IMAGE_LABEL = "${env.BUILD_ID}"
+        def WORKING_DIR = 'apis/user-java/'
     }
     stages {
         stage('Build') { 
             steps {
-                sh 'cd apis/user-java/ && mvn -B -DskipTests clean package' 
+                sh 'cd ${WORKING_DIR} && mvn -B -DskipTests clean package' 
             }
         }
         stage('Test') {
             steps {
-                sh 'cd apis/user-java/ && mvn test'
+                sh 'cd ${WORKING_DIR} && mvn test'
             }
             post {
                 always {
-                    junit 'apis/user-java/target/surefire-reports/*.xml'
+                    junit '${WORKING_DIR}/target/surefire-reports/*.xml'
                 }
             }
         }
         stage('DockerBuild') {
+            when {
+              expression {
+                currentBuild.result == 'SUCCESS' 
+              }
+            }
             steps {
-                sh 'cd apis/user-java/ && docker build . -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL}'
+                sh 'cd ${WORKING_DIR} && docker build . -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL} -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
             }
         }
         stage('DockerPush') {
