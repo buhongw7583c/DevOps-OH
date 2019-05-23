@@ -25,7 +25,7 @@ pipeline {
             }
             post {
                 always {
-                    junit '${WORKING_DIR}/target/surefire-reports/*.xml'
+                    junit "${WORKING_DIR}/target/surefire-reports/*.xml"
                 }
             }
         }
