@@ -1,31 +1,30 @@
 pipeline {
     agent {
         docker {
-            //image 'maven:3-alpine' 
-            image 'mavendocker:alpine'
+            image 'TODO image for Node.JS BUILD & DOCKER'
             args '-v /root/.m2:/root/.m2' 
         }
     }
     environment {
         CONTAINER_REG_CRED = credentials('acr-h2floh-principal')
         def REGISTRY_SERVER = 'h2floh.azurecr.io'
-        def CONTAINER_IMAGE_NAME = 'devopsoh/api-user-java'
+        def CONTAINER_IMAGE_NAME = 'devopsoh/api-user'
         def CONTAINER_IMAGE_LABEL = "${env.BUILD_ID}"
-        def WORKING_DIR = 'apis/user-java/'
+        def WORKING_DIR = 'apis/userprofile/'
     }
     stages {
         stage('Build') { 
             steps {
-                sh 'cd ${WORKING_DIR} && mvn -B -DskipTests clean package' 
+                sh  'cd ${WORKING_DIR} && TODO Node.JS BUILD' 
             }
         }
         stage('Test') {
             steps {
-                sh 'cd ${WORKING_DIR} && mvn test'
+                sh 'cd ${WORKING_DIR} && TODO Node.JS TEST'
             }
             post {
                 always {
-                    junit "${WORKING_DIR}/target/surefire-reports/*.xml"
+                    //TODO Report Test for Node.JS Jenkins 
                 }
             }
         }
