@@ -27,7 +27,7 @@ pipeline {
         }
         stage('DockerBuild') {
             steps {
-                sh 'cd ${WORKING_DIR} && docker build . -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL} -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
+                sh 'cd ${WORKING_DIR}/web && docker build . -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL} -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
             }
         }
         stage('DockerPush') {

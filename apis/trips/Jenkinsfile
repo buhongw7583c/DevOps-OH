@@ -1,7 +1,9 @@
+REGISTRY_SERVER = 'h2floh.azurecr.io'
+
 pipeline {
     agent {
         docker {
-            image 'TODO image for GO BUILD & DOCKER'
+            image "${REGISTRY_SERVER}/devopsoh/go:build"
             args '-v /root/.m2:/root/.m2' 
         }
     }
@@ -15,12 +17,12 @@ pipeline {
     stages {
         stage('Build') { 
             steps {
-                sh  'cd ${WORKING_DIR} && TODO GO BUILD' 
+                sh  'cd ${WORKING_DIR} && go get && CGO_ENABLED=0 GOOS=linux go build -o main .' 
             }
         }
         stage('Test') {
             steps {
-                sh 'cd ${WORKING_DIR} && TODO GO BUILD'
+                sh 'cd ${WORKING_DIR} && go test'
             }
             post {
                 always {
