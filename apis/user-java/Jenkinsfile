@@ -1,17 +1,19 @@
+REGISTRY_SERVER = 'h2floh.azurecr.io'
+
 pipeline {
+    agent {
+        docker {
+            //image 'maven:3-alpine' 
+            image "${REGISTRY_SERVER}/devopsoh/maven:build"
+            args '-v /root/.m2:/root/.m2' 
+        }
+    }
     environment {
         CONTAINER_REG_CRED = credentials('acr-h2floh-principal')
         def REGISTRY_SERVER = 'h2floh.azurecr.io'
         def CONTAINER_IMAGE_NAME = 'devopsoh/api-user-java'
         def CONTAINER_IMAGE_LABEL = "${env.BUILD_ID}"
         def WORKING_DIR = 'apis/user-java/'
-    }
-    agent {
-        docker {
-            //image 'maven:3-alpine' 
-            image "${env.REGISTRY_SERVER}/devopsoh/maven:build"
-            args '-v /root/.m2:/root/.m2' 
-        }
     }
     stages {
         stage('Build') { 
