@@ -24,11 +24,6 @@ pipeline {
             steps {
                 sh 'cd ${WORKING_DIR} && npm test'
             }
-            post {
-                always {
-                    //TODO Report Test for Node.JS Jenkins 
-                }
-            }
         }
         stage('DockerBuild') {
             steps {
