@@ -13,6 +13,7 @@ pipeline {
         def CONTAINER_IMAGE_NAME = 'devopsoh/api-trip'
         def CONTAINER_IMAGE_LABEL = "${env.BUILD_ID}"
         def WORKING_DIR = 'apis/trips/'
+        def GO111MODULE = 'on'
     }
     stages {
         stage('Build') { 
@@ -22,7 +23,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh 'cd ${WORKING_DIR} && go test'
+                sh "cd ${WORKING_DIR} && CGO_ENABLED=0 GOOS=linux go test -run ''"
             }
         }
         stage('DockerBuild') {
