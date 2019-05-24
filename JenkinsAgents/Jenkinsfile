@@ -9,7 +9,7 @@ pipeline {
     agent {
         docker {
             image 'docker:latest'
-            args '-v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock' 
+            args '-v /var/run/docker.sock:/var/run/docker.sock' 
         }
     }
     environment {
@@ -28,7 +28,7 @@ pipeline {
         }
         stage('DockerPush') {
             steps {
-                sh 'sudo docker login -p ${CONTAINER_REG_CRED_PSW} -u ${CONTAINER_REG_CRED_USR} ${REGISTRY_SERVER}'  
+                sh 'docker login -p ${CONTAINER_REG_CRED_PSW} -u ${CONTAINER_REG_CRED_USR} ${REGISTRY_SERVER}'  
                 sh 'docker push ${REGISTRY_SERVER}/devopsoh/maven:build'
                 sh 'docker push ${REGISTRY_SERVER}/devopsoh/go:build'
                 sh 'docker push ${REGISTRY_SERVER}/devopsoh/netcore:build'
