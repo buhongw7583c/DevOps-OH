@@ -1,3 +1,10 @@
+properties([
+  parameters([
+    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'h2floh.azurecr.io'),
+    string(name: 'CONTAINER_REGISTRY_JENKINS_CREDENTIALS', defaultValue: 'acr-h2floh-principal'),
+  ])
+])
+
 pipeline {
     agent {
         docker {
@@ -6,8 +13,8 @@ pipeline {
         }
     }
     environment {
-        CONTAINER_REG_CRED = credentials('acr-h2floh-principal')
-        def REGISTRY_SERVER = 'h2floh.azurecr.io'
+        CONTAINER_REG_CRED = credentials("${params.CONTAINER_REGISTRY_JENKINS_CREDENTIALS}")
+        def REGISTRY_SERVER = "${params.CONTAINER_REGISTRY_SERVER}"
         def WORKING_DIR = 'JenkinsAgents'
     }
     stages {

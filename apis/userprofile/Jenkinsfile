@@ -1,15 +1,20 @@
-REGISTRY_SERVER = 'h2floh.azurecr.io'
+properties([
+  parameters([
+    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'h2floh.azurecr.io'),
+    string(name: 'CONTAINER_REGISTRY_JENKINS_CREDENTIALS', defaultValue: 'acr-h2floh-principal'),
+  ])
+])
 
 pipeline {
     agent {
         docker {
-            image "${REGISTRY_SERVER}/devopsoh/nodejs:build"
+            image "${params.CONTAINER_REGISTRY_SERVER}/devopsoh/nodejs:build"
             args '-v /root/.m2:/root/.m2' 
         }
     }
     environment {
-        CONTAINER_REG_CRED = credentials('acr-h2floh-principal')
-        def REGISTRY_SERVER = 'h2floh.azurecr.io'
+        CONTAINER_REG_CRED = credentials("${params.CONTAINER_REGISTRY_JENKINS_CREDENTIALS}")
+        def REGISTRY_SERVER = "${params.CONTAINER_REGISTRY_SERVER}"
         def CONTAINER_IMAGE_NAME = 'devopsoh/api-user'
         def CONTAINER_IMAGE_LABEL = "${env.BUILD_ID}"
         def WORKING_DIR = 'apis/userprofile/'
