@@ -1,7 +1,9 @@
+REGISTRY_SERVER = 'h2floh.azurecr.io'
+
 pipeline {
     agent {
         docker {
-            image 'TODO image for .NET Core BUILD & DOCKER'
+            image "${REGISTRY_SERVER}/devopsoh/netcore:build"
             args '-v /root/.m2:/root/.m2' 
         }
     }
@@ -15,17 +17,12 @@ pipeline {
     stages {
         stage('Build') { 
             steps {
-                sh  'cd ${WORKING_DIR} && TODO .NET Core BUILD' 
+                sh  'cd ${WORKING_DIR} && dotnet build' 
             }
         }
         stage('Test') {
             steps {
-                sh 'cd ${WORKING_DIR} && TODO .NET Core TEST'
-            }
-            post {
-                always {
-                    //TODO Report Test for .NET Core Jenkins 
-                }
+                sh 'cd ${WORKING_DIR} && dotnet test --test-adapter-path:. --logger:xunit'
             }
         }
         stage('DockerBuild') {
