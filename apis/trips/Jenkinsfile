@@ -23,7 +23,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh "cd ${WORKING_DIR} && CGO_ENABLED=0 GOOS=linux go test -run ''"
+                sh "cd ${WORKING_DIR}/tests && CGO_ENABLED=0 GOOS=linux go test -run ''"
             }
         }
         stage('DockerBuild') {
