@@ -22,7 +22,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh 'cd ${WORKING_DIR} && dotnet test --test-adapter-path:. --logger:xunit'
+                sh 'cd ${WORKING_DIR} && dotnet test'
             }
         }
         stage('DockerBuild') {
