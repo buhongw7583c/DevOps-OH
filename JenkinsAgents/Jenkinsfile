@@ -28,7 +28,7 @@ pipeline {
         }
         stage('DockerPush') {
             steps {
-                sh 'docker login -p ${CONTAINER_REG_CRED_PSW} -u ${CONTAINER_REG_CRED_USR} ${REGISTRY_SERVER}'  
+                sh 'cd ${WORKING_DIR} && docker login -p ${CONTAINER_REG_CRED_PSW} -u ${CONTAINER_REG_CRED_USR} ${REGISTRY_SERVER}'  
                 sh 'docker push ${REGISTRY_SERVER}/devopsoh/maven:build'
                 sh 'docker push ${REGISTRY_SERVER}/devopsoh/go:build'
                 sh 'docker push ${REGISTRY_SERVER}/devopsoh/netcore:build'
