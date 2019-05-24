@@ -1,7 +1,9 @@
+REGISTRY_SERVER = 'h2floh.azurecr.io'
+
 pipeline {
     agent {
         docker {
-            image 'TODO image for Node.JS BUILD & DOCKER'
+            image "${REGISTRY_SERVER}/devopsoh/nodejs:build"
             args '-v /root/.m2:/root/.m2' 
         }
     }
@@ -15,12 +17,12 @@ pipeline {
     stages {
         stage('Build') { 
             steps {
-                sh  'cd ${WORKING_DIR} && TODO Node.JS BUILD' 
+                sh  'cd ${WORKING_DIR} && npm install' 
             }
         }
         stage('Test') {
             steps {
-                sh 'cd ${WORKING_DIR} && TODO Node.JS TEST'
+                sh 'cd ${WORKING_DIR} && npm test'
             }
             post {
                 always {

@@ -24,11 +24,6 @@ pipeline {
             steps {
                 sh 'cd ${WORKING_DIR} && go test'
             }
-            post {
-                always {
-                    //TODO Report Test for GO Jenkins 
-                }
-            }
         }
         stage('DockerBuild') {
             steps {
