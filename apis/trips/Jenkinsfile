@@ -9,7 +9,7 @@ pipeline {
     agent {
         docker {
             image "${params.CONTAINER_REGISTRY_SERVER}/devopsoh/go:build"
-            args '-v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock' 
+            args '-u root -v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock' 
         }
     }
     environment {
