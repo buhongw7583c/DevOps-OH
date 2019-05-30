@@ -2,6 +2,9 @@ properties([
   parameters([
     string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'h2floh.azurecr.io'),
     string(name: 'CONTAINER_REGISTRY_JENKINS_CREDENTIALS', defaultValue: 'acr-h2floh-principal'),
+    string(name: 'AZURE_JENKINS_CREDENTIALS', defaultValue: 'azure-admin-credentials'),
+    string(name: 'AKS_RESSOURCE_GROUP', defaultValue: ''),
+    string(name: 'AKS_CLUSTER_NAME', defaultValue: ''),
   ])
 ])
 
@@ -14,7 +17,10 @@ pipeline {
     }
     environment {
         CONTAINER_REG_CRED = credentials("${params.CONTAINER_REGISTRY_JENKINS_CREDENTIALS}")
+        AZURE_CRED = credentials("${params.CONTAINER_REGISTRY_JENKINS_CREDENTIALS}")
         def REGISTRY_SERVER = "${params.CONTAINER_REGISTRY_SERVER}"
+        def AKS_RESSOURCE_GROUP = "${params.AKS_RESSOURCE_GROUP}"
+        def AKS_CLUSTER_NAME = "${params.AKS_CLUSTER_NAME}"
         def CONTAINER_IMAGE_NAME = 'devopsoh/api-poi'
         def CONTAINER_IMAGE_LABEL = "${env.BUILD_ID}"
         def WORKING_DIR = 'apis/poi/'
@@ -40,6 +46,12 @@ pipeline {
                 sh 'docker login -p ${CONTAINER_REG_CRED_PSW} -u ${CONTAINER_REG_CRED_USR} ${REGISTRY_SERVER}'  
                 sh 'docker push ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL}'
                 sh 'docker push ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'az login -p ${AZURE_CRED_PSW} -u ${AZURE_CRED_USR}'  
+                sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
             }
         }
     }
