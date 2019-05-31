@@ -3,9 +3,9 @@ properties([
     string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'h2floh.azurecr.io'),
     string(name: 'CONTAINER_REGISTRY_JENKINS_CREDENTIALS', defaultValue: 'acr-h2floh-principal'),
     string(name: 'AZURE_JENKINS_CREDENTIALS', defaultValue: 'azure-admin-credentials'),
-    string(name: 'AKS_RESSOURCE_GROUP', defaultValue: ''),
-    string(name: 'AKS_CLUSTER_NAME', defaultValue: ''),
-    string(name: 'ENDPOINT_FQDN', defaultValue: ''),  
+    string(name: 'AKS_RESSOURCE_GROUP', defaultValue: 'openhacktby1rg'),
+    string(name: 'AKS_CLUSTER_NAME', defaultValue: 'openhacktby1aks'),
+    string(name: 'ENDPOINT_FQDN', defaultValue: 'akstraefikopenhacktby1.eastasia.cloudapp.azure.com'),  
   ])
 ])
 
