@@ -27,38 +27,39 @@ pipeline {
         def ENDPOINT_FQDN = "${params.ENDPOINT_FQDN}"
         def WORKING_DIR = 'apis/poi/'
     }
-    stages {
-        stage('Build') { 
-            steps {
-                sh  'cd ${WORKING_DIR} && dotnet build' 
-            }
-        }
-        stage('Test') {
-            steps {
-                sh 'cd ${WORKING_DIR} && dotnet test'
-            }
-        }
-        stage('DockerBuild') {
-            steps {
-                sh 'cd ${WORKING_DIR}/web && docker build . -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL} -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
-            }
-        }
-        stage('DockerPush') {
-            steps {
-                sh 'docker login -p ${CONTAINER_REG_CRED_PSW} -u ${CONTAINER_REG_CRED_USR} ${REGISTRY_SERVER}'  
-                sh 'docker push ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL}'
-                sh 'docker push ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
-            }
-        }
-        stage('Deploy') {
+    stage('Deploy') {
             steps {
                 sh 'az login -p ${AZURE_CRED_PSW} -u ${AZURE_CRED_USR}'  
                 sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
-                sh "sed -i 's/[ContainerImageName]/${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest/g' ${WORKING_DIR}/charts/values.yaml"
+                sh "sed -i 's/[ContainerImageName]/${REGISTRY_SERVER}\/${CONTAINER_IMAGE_NAME}:latest\/g' ${WORKING_DIR}/charts/values.yaml"
                 sh "sed -i 's/[EndpointFQDN]/${ENDPOINT_FQDN}/g' ${WORKING_DIR}/charts/values.yaml"
                 sh 'helm init --upgrade'
                 sh 'helm install ${WORKING_DIR}/charts --name mydrive-poi'
             }
-        }
+    }
+    // stages {
+    //     stage('Build') { 
+    //         steps {
+    //             sh  'cd ${WORKING_DIR} && dotnet build' 
+    //         }
+    //     }
+    //     stage('Test') {
+    //         steps {
+    //             sh 'cd ${WORKING_DIR} && dotnet test'
+    //         }
+    //     }
+    //     stage('DockerBuild') {
+    //         steps {
+    //             sh 'cd ${WORKING_DIR}/web && docker build . -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL} -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
+    //         }
+    //     }
+    //     stage('DockerPush') {
+    //         steps {
+    //             sh 'docker login -p ${CONTAINER_REG_CRED_PSW} -u ${CONTAINER_REG_CRED_USR} ${REGISTRY_SERVER}'  
+    //             sh 'docker push ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL}'
+    //             sh 'docker push ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
+    //         }
+    //     }
+
     }
 }
