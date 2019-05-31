@@ -27,7 +27,8 @@ pipeline {
         def ENDPOINT_FQDN = "${params.ENDPOINT_FQDN}"
         def WORKING_DIR = 'apis/poi/'
     }
-    stage('Deploy') {
+     stages {
+        stage('Deploy') {
             steps {
                 sh 'az login -p ${AZURE_CRED_PSW} -u ${AZURE_CRED_USR}'  
                 sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
@@ -36,8 +37,7 @@ pipeline {
                 sh 'helm init --upgrade'
                 sh 'helm install ${WORKING_DIR}/charts --name mydrive-poi'
             }
-    }
-    // stages {
+        }
     //     stage('Build') { 
     //         steps {
     //             sh  'cd ${WORKING_DIR} && dotnet build' 
@@ -60,5 +60,5 @@ pipeline {
     //             sh 'docker push ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
     //         }
     //     }
-
+    }
 }
