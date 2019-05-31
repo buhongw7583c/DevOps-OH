@@ -17,7 +17,7 @@ pipeline {
     }
     environment {
         CONTAINER_REG_CRED = credentials("${params.CONTAINER_REGISTRY_JENKINS_CREDENTIALS}")
-        AZURE_CRED = credentials("${params.CONTAINER_REGISTRY_JENKINS_CREDENTIALS}")
+        AZURE_CRED = credentials("${params.AZURE_JENKINS_CREDENTIALS}")
         def REGISTRY_SERVER = "${params.CONTAINER_REGISTRY_SERVER}"
         def AKS_RESSOURCE_GROUP = "${params.AKS_RESSOURCE_GROUP}"
         def AKS_CLUSTER_NAME = "${params.AKS_CLUSTER_NAME}"
