@@ -7,7 +7,7 @@ blue:
   tag: latest
 
 green:
-  enabled: false
+  enabled: true
   tag: latest
 
 replicaCount: 2
