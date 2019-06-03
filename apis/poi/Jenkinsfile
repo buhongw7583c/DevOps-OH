@@ -57,11 +57,13 @@ pipeline {
                 sh 'az login -p ${AZURE_CRED_PSW} -u ${AZURE_CRED_USR}'  
                 sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
                 sh 'helm init --upgrade'
-                sh 'cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set ${DEPLOYMENT_SLOT}.enabled=true,${DEPLOYMENT_SLOT}.tag=${CONTAINER_IMAGE_LABEL} --debug'
+                sh 'cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set ${DEPLOYMENT_SLOT}.enabled=true,${DEPLOYMENT_SLOT}.tag=${CONTAINER_IMAGE_LABEL} --reuse-values --debug'
             }
         }
         stage("Test Kubernetes stage") {
             steps {
+                def time = 10;
+                sleep time.toInteger() // seconds
                 sh 'echo "Test Completed!"'
             }
         }
