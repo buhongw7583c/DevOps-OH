@@ -5,8 +5,7 @@ properties([
     string(name: 'AZURE_JENKINS_CREDENTIALS', defaultValue: 'azure-admin-credentials'),
     string(name: 'AKS_RESSOURCE_GROUP', defaultValue: 'openhacktby1rg'),
     string(name: 'AKS_CLUSTER_NAME', defaultValue: 'openhacktby1aks'),
-    string(name: 'ENDPOINT_FQDN', defaultValue: 'akstraefikopenhacktby1.eastasia.cloudapp.azure.com'),  
-    string(name: 'PRODUCTION_SLOT', defaultValue: 'blue'),  
+    string(name: 'DEPLOYMENT_SLOT', defaultValue: 'blue'),  
   ])
 ])
 pipeline {
@@ -26,8 +25,8 @@ pipeline {
         def CONTAINER_IMAGE_LABEL = "${env.BUILD_ID}"
         def ENDPOINT_FQDN = "${params.ENDPOINT_FQDN}"
         def WORKING_DIR = 'apis/poi/'
-        def PRODUCTION_SLOT = "${params.PRODUCTION_SLOT}"
-        def STAGE_SLOT = sh(script: "if [ 'blue' == '${params.PRODUCTION_SLOT}' ]; then echo 'green'; else echo 'blue'; fi;")
+        def DEPLOYMENT_SLOT = "${params.DEPLOYMENT_SLOT}"
+        //def STAGE_SLOT = sh(script: "if [ 'blue' == '${params.DEPLOYMENT_SLOT}' ]; then echo 'green'; else echo 'blue'; fi;")
     }
      stages {
 
@@ -53,22 +52,22 @@ pipeline {
                 sh 'docker push ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
             }
         }
-        stage('Deploying to Kubernetes Stage') {
+        stage('Deploying to Kubernetes ${DEPLOYMENT_SLOT} slot') {
             steps {
                 sh 'az login -p ${AZURE_CRED_PSW} -u ${AZURE_CRED_USR}'  
                 sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
                 sh 'helm init --upgrade'
-                sh 'cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set ${STAGE_SLOT}.enabled=true,${STAGE_SLOT}.tag=${CONTAINER_IMAGE_LABEL} --debug'
+                sh 'cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set ${DEPLOYMENT_SLOT}.enabled=true,${DEPLOYMENT_SLOT}.tag=${CONTAINER_IMAGE_LABEL} --debug'
             }
         }
-        stage('Test Kubernetes Stage') {
+        stage('Test Kubernetes ${DEPLOYMENT_SLOT} slot') {
             steps {
                 sh 'echo "Test Completed!"'
             }
         }
-        stage('Switch References') {
+        stage('Switching Traefik to use ${DEPLOYMENT_SLOT} slot as Production') {
             steps {
-                sh 'cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set productionSlot=${PRODUCTION_SLOT} --reuse-values'
+                sh 'cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set productionSlot=${DEPLOYMENT_SLOT} --reuse-values'
             }
         }
     }
