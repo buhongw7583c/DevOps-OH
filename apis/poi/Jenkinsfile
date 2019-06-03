@@ -6,9 +6,9 @@ properties([
     string(name: 'AKS_RESSOURCE_GROUP', defaultValue: 'openhacktby1rg'),
     string(name: 'AKS_CLUSTER_NAME', defaultValue: 'openhacktby1aks'),
     string(name: 'ENDPOINT_FQDN', defaultValue: 'akstraefikopenhacktby1.eastasia.cloudapp.azure.com'),  
+    string(name: 'PRODUCTION_SLOT', defaultValue: 'blue'),  
   ])
 ])
-
 pipeline {
     agent {
         docker {
@@ -26,42 +26,50 @@ pipeline {
         def CONTAINER_IMAGE_LABEL = "${env.BUILD_ID}"
         def ENDPOINT_FQDN = "${params.ENDPOINT_FQDN}"
         def WORKING_DIR = 'apis/poi/'
+        def PRODUCTION_SLOT = "${params.PRODUCTION_SLOT}"
+        def STAGE_SLOT = sh(script: "if [ 'blue' == '${params.PRODUCTION_SLOT}' ]; then echo 'green'; else echo 'blue'; fi;")
     }
      stages {
-        stage('Deploy') {
+
+        stage('Build') { 
+            steps {
+                sh  'cd ${WORKING_DIR} && dotnet build' 
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'cd ${WORKING_DIR} && dotnet test'
+            }
+        }
+        stage('DockerBuild') {
+            steps {
+                sh 'cd ${WORKING_DIR}/web && docker build . -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL} -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
+            }
+        }
+        stage('DockerPush') {
+            steps {
+                sh 'docker login -p ${CONTAINER_REG_CRED_PSW} -u ${CONTAINER_REG_CRED_USR} ${REGISTRY_SERVER}'  
+                sh 'docker push ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL}'
+                sh 'docker push ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
+            }
+        }
+        stage('Deploying to Kubernetes Stage') {
             steps {
                 sh 'az login -p ${AZURE_CRED_PSW} -u ${AZURE_CRED_USR}'  
                 sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
-                sh "sed -i 's,ContainerImageName,${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest,g' ${WORKING_DIR}/charts/mydrive-poi/values.yaml"
-                sh "sed -i 's/EndpointFQDN/${ENDPOINT_FQDN}/g' ${WORKING_DIR}/charts/mydrive-poi/values.yaml"
-                sh 'cat ${WORKING_DIR}/charts/mydrive-poi/values.yaml'
-                //sh 'kubectl get pods'
-                //sh 'helm list'
                 sh 'helm init --upgrade'
-                sh 'helm install mydrive-poi ${WORKING_DIR}/charts/mydrive-poi'
+                sh 'cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set ${STAGE_SLOT}.enabled=true,${STAGE_SLOT}.tag=${CONTAINER_IMAGE_LABEL} --debug'
             }
         }
-    //     stage('Build') { 
-    //         steps {
-    //             sh  'cd ${WORKING_DIR} && dotnet build' 
-    //         }
-    //     }
-    //     stage('Test') {
-    //         steps {
-    //             sh 'cd ${WORKING_DIR} && dotnet test'
-    //         }
-    //     }
-    //     stage('DockerBuild') {
-    //         steps {
-    //             sh 'cd ${WORKING_DIR}/web && docker build . -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL} -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
-    //         }
-    //     }
-    //     stage('DockerPush') {
-    //         steps {
-    //             sh 'docker login -p ${CONTAINER_REG_CRED_PSW} -u ${CONTAINER_REG_CRED_USR} ${REGISTRY_SERVER}'  
-    //             sh 'docker push ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL}'
-    //             sh 'docker push ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
-    //         }
-    //     }
+        stage('Test Kubernetes Stage') {
+            steps {
+                sh 'echo "Test Completed!"'
+            }
+        }
+        stage('Switch References') {
+            steps {
+                sh 'cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set productionSlot=${PRODUCTION_SLOT} --reuse-values'
+            }
+        }
     }
 }
