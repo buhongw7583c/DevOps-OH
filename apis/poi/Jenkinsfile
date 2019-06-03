@@ -52,7 +52,7 @@ pipeline {
                 sh 'docker push ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
             }
         }
-        stage("Deploying to Kubernetes ${DEPLOYMENT_SLOT} slot") {
+        stage('Deploying to Kubernetes stage slot') {
             steps {
                 sh 'az login -p ${AZURE_CRED_PSW} -u ${AZURE_CRED_USR}'  
                 sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
@@ -60,12 +60,12 @@ pipeline {
                 sh 'cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set ${DEPLOYMENT_SLOT}.enabled=true,${DEPLOYMENT_SLOT}.tag=${CONTAINER_IMAGE_LABEL} --debug'
             }
         }
-        stage("Test Kubernetes ${DEPLOYMENT_SLOT} slot") {
+        stage("Test Kubernetes stage") {
             steps {
                 sh 'echo "Test Completed!"'
             }
         }
-        stage("Switching Traefik to use ${DEPLOYMENT_SLOT} slot as Production") {
+        stage("Switching Traefik to use deployment slot as new Production") {
             steps {
                 sh 'cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set productionSlot=${DEPLOYMENT_SLOT} --reuse-values'
             }
