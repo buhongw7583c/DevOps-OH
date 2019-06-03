@@ -62,8 +62,7 @@ pipeline {
         }
         stage("Test Kubernetes stage") {
             steps {
-                def time = 10;
-                sleep time.toInteger() // seconds
+                sleep(time:10,unit:"SECONDS")
                 sh 'echo "Test Completed!"'
             }
         }
