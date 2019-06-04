@@ -64,9 +64,8 @@ pipeline {
             }
         }
         stage("Test Kubernetes stage") {
-            steps {
-                sleep(time:10,unit:"SECONDS")
-                sh 'echo "Test Completed!"'
+            input{
+                message "Do you want to proceed for production deployment?"
             }
         }
         stage("Switching Traefik to use deployment slot as new Production") {
