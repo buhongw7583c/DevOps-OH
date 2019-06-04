@@ -63,12 +63,12 @@ pipeline {
                 }
             }
         }
-        stage("Test Kubernetes stage") {
+        stage("Switching Traefik to use deployment slot as new Production") {
             input{
                 message "Do you want to proceed for production deployment?"
+                ok "Yes, go ahead."
+                submitter "wagnerfl"
             }
-        }
-        stage("Switching Traefik to use deployment slot as new Production") {
             steps {
                 script
                 {

@@ -10,6 +10,8 @@ green:
   enabled: true
   tag: latest
 
+
+
 replicaCount: 2
 repository:
   # Fully qualified path to image in ACR (Ex. youracr.azurecr.io/devopsoh/poi-build).
@@ -23,6 +25,7 @@ image:
 service:
   externalPort: 80
 ingress:
+  canarypercentage: 0%
   enabled: true
   annotations:
     kubernetes.io/ingress.class: traefik

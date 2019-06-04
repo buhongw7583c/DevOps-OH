@@ -1,0 +1,35 @@
+properties([
+  parameters([
+    string(name: 'CANARYPERCENTAGE', defaultValue: '0%'),
+    string(name: 'AZURE_JENKINS_CREDENTIALS', defaultValue: 'azure-admin-credentials'),
+    string(name: 'AKS_RESSOURCE_GROUP', defaultValue: 'openhacktby1rg'),
+    string(name: 'AKS_CLUSTER_NAME', defaultValue: 'openhacktby1aks'),
+  ])
+])
+pipeline {
+    agent {
+        docker {
+            image "${params.CONTAINER_REGISTRY_SERVER}/devopsoh/netcore:build"
+            args '-u root -v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock' 
+        }
+    }
+    environment {
+        AZURE_CRED = credentials("${params.AZURE_JENKINS_CREDENTIALS}")
+        def CANARYPERCENTAGE = "${params.CANARYPERCENTAGE}"
+        def AKS_RESSOURCE_GROUP = "${params.AKS_RESSOURCE_GROUP}"
+        def AKS_CLUSTER_NAME = "${params.AKS_CLUSTER_NAME}"
+        def WORKING_DIR = 'apis/poi/'
+    }
+     stages {
+        stage("Increasing Canary Percentage") {
+            steps {
+                script
+                {
+                    sh 'az login -p ${AZURE_CRED_PSW} -u ${AZURE_CRED_USR}'  
+                    sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
+                    sh "cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set ingress.canarypercentage=${CANARYPERCENTAGE} --reuse-values"
+                }
+            }
+        }
+    }
+}
