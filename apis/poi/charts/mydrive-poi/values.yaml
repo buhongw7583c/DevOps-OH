@@ -7,14 +7,16 @@ blue:
   tag: latest
 
 green:
-  enabled: false
+  enabled: true
   tag: latest
+
+
 
 replicaCount: 2
 repository:
   # Fully qualified path to image in ACR (Ex. youracr.azurecr.io/devopsoh/poi-build).
   # See deployment scripts in https://github.com/Azure-Samples/openhack-devops-proctor for example usage.
-  image:
+  image: h2floh.azurecr.io/devopsoh/api-poi
   pullPolicy: Always
 image:
   name: mydrive-poi
@@ -23,13 +25,14 @@ image:
 service:
   externalPort: 80
 ingress:
+  canarypercentage: 0%
   enabled: true
   annotations:
     kubernetes.io/ingress.class: traefik
   rules:
     endpoint:
       #fqdn of your exposed application (found in ohteamvalues file)
-      host:
+      host: akstraefikopenhacktby1.eastasia.cloudapp.azure.com
       paths:
       - path: /api/poi
         serviceName: api-poi-svc

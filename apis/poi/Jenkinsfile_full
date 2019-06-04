@@ -62,5 +62,20 @@ pipeline {
                 }
             }
         }
+        stage("Switching Traefik to use deployment slot as new Production") {
+            input{
+                message "Do you want to proceed for production deployment?"
+                ok "Yes, go ahead."
+                submitter "wagnerfl"
+            }
+            steps {
+                script
+                {
+                    def CURR_PROD_SLOT = sh(script: 'kubectl get svc -o jsonpath="{.spec.selector.slot}" ${PROD_SERVICE_NAME}', returnStdout: true).trim()
+                    def DEPLOYMENT_SLOT = sh(script: "if [ \\\"blue\\\" == \\\"${CURR_PROD_SLOT}\\\" ]; then echo green; else echo blue; fi;", returnStdout: true).trim()
+                    sh "cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set productionSlot=${DEPLOYMENT_SLOT} --reuse-values"
+                }
+            }
+        }
     }
 }
