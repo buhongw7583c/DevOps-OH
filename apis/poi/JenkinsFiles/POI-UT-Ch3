@@ -11,18 +11,17 @@ pipeline {
         }
     }
     environment {
-        def WORKING_DIR = 'apis/poi/web'
-        def UT_DIR = 'apis/poi/tests/UnitTests'
+        def WORKING_DIR = 'apis/poi'
     }
     stages {
         stage('Build') { 
             steps {
-                sh 'cd ${WORKING_DIR} && dotnet build' 
+                sh 'cd ${WORKING_DIR}/web && dotnet build' 
             }
         }
         stage('Test') {
             steps {
-                sh 'cd ${UT_DIR} && dotnet test'
+                sh 'cd ${WORKING_DIR}/tests/UnitTests && dotnet test'
             }
         }
     }
