@@ -1,0 +1,28 @@
+properties([
+  parameters([
+    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'openhackug94acr.azurecr.io'),
+    string(name: 'TRAEFIK_URL', defaultValue: 'akstraefikopenhackug94.eastus.cloudapp.azure.com'),
+  ])
+])
+pipeline {
+    agent {
+        docker {
+            image "${params.CONTAINER_REGISTRY_SERVER}/devopsoh/netcore:build"
+            args '-u root -v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock' 
+        }
+    }
+    environment {
+        def REGISTRY_SERVER = "${params.CONTAINER_REGISTRY_SERVER}"
+        def ENDPOINT = "${params.TRAEFIK_URL}"
+        def CONTAINER_IMAGE_NAME = 'devopsoh/api-poi'
+        def WORKING_DIR = 'apis/poi'
+    }
+    stages {
+        stage('Deploying to AKS') {
+            steps {
+                sh 'helm init --upgrade'
+                sh "cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set repository.image=${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME},env.webServerBaseUri=http://${ENDPOINT},ingress.rules.endpoint.host=${ENDPOINT} --reuse-values --debug"
+            }
+        }
+    }
+}
