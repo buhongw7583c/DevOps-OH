@@ -1,0 +1,34 @@
+properties([
+  parameters([
+    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'openhackug94acr.azurecr.io'),
+  ])
+])
+
+pipeline {
+    agent {
+        docker {
+            image "${params.CONTAINER_REGISTRY_SERVER}/devopsoh/maven:build"
+            args '-u root -v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock' 
+        }
+    }
+    environment {
+        def WORKING_DIR = 'apis/user-java'
+    }
+    stages {
+        stage('Build') { 
+            steps {
+                sh 'cd ${WORKING_DIR} && mvn -B -DskipTests clean package' 
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'cd ${WORKING_DIR} && mvn test'
+            }
+            post {
+                always {
+                    junit "${WORKING_DIR}/target/surefire-reports/*.xml"
+                }
+            }
+        }
+    }
+}
