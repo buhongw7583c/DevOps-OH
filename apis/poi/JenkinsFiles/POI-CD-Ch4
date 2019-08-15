@@ -20,6 +20,7 @@ pipeline {
     stages {
         stage('Deploying to AKS') {
             steps {
+                sh "cat ~/.kube/config"
                 sh "cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set repository.image=${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME},env.webServerBaseUri=http://${ENDPOINT},ingress.rules.endpoint.host=${ENDPOINT} --debug"
             }
         }
