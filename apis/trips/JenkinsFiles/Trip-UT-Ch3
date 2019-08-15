@@ -1,0 +1,29 @@
+properties([
+  parameters([
+    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'openhackug94acr.azurecr.io'),
+  ])
+])
+
+pipeline {
+    agent {
+        docker {
+            image "${params.CONTAINER_REGISTRY_SERVER}/devopsoh/go:build"
+            args '-u root -v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock' 
+        }
+    }
+    environment {
+        def WORKING_DIR = 'apis/trips'
+    }
+    stages {
+        stage('Build') { 
+            steps {
+                sh 'cd ${WORKING_DIR} && CGO_ENABLED=0 GOOS=linux go build -o main .' 
+            }
+        }
+        stage('Test') {
+            steps {
+                sh "cd ${WORKING_DIR}/tests && CGO_ENABLED=0 GOOS=linux go test -run ''"
+            }
+        }
+    }
+}
