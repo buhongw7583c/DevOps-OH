@@ -15,7 +15,7 @@ pipeline {
         def REGISTRY_SERVER = "${params.CONTAINER_REGISTRY_SERVER}"
         def ENDPOINT = "${params.TRAEFIK_URL}"
         def CONTAINER_IMAGE_NAME = 'devopsoh/api-poi'
-        def WORKING_DIR = '/apis/poi'
+        def WORKING_DIR = 'apis/poi'
     }
     stages {
         stage('Deploying to AKS') {
