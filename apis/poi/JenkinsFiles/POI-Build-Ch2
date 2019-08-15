@@ -16,12 +16,12 @@ pipeline {
         def REGISTRY_SERVER = "${params.CONTAINER_REGISTRY_SERVER}"
         def CONTAINER_IMAGE_NAME = 'devopsoh/api-poi'
         def CONTAINER_IMAGE_LABEL = "jenkins-${env.BUILD_ID}"
-        def WORKING_DIR = 'apis/poi/web'
+        def WORKING_DIR = 'apis/poi'
     }
     stages {
         stage('DockerBuild') {
             steps {
-                sh 'cd ${WORKING_DIR} && docker build . -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL} -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
+                sh 'cd ${WORKING_DIR}/web && docker build . -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_LABEL} -t ${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME}:latest'
             }
         }
         stage('DockerPush') {
