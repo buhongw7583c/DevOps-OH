@@ -28,12 +28,6 @@ RUN rm helm-v2.14.0-linux-amd64.tar.gz
 # Verify
 RUN helm help
 
-#Solution for Error: configmaps is forbidden: User "system:serviceaccount:kube-system:default" cannot list configmaps in the namespace "kube-system"
-RUN kubectl create serviceaccount --namespace kube-system tiller
-RUN kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-RUN kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
-RUN helm init --service-account tiller --upgrade
-
 #Install Azure CLI
 WORKDIR /
 RUN apk add --no-cache python3 && \
