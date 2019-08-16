@@ -30,7 +30,6 @@ pipeline {
             steps {
                 sh 'az login --service-principal -u ${AZURE_CRED_USR} -p ${AZURE_CRED_PSW} --tenant ${TENANT_ID}'
                 sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
-                sh 'helm init --upgrade'
                 sh "cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set repository.image=${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME},env.webServerBaseUri=http://${ENDPOINT},ingress.rules.endpoint.host=${ENDPOINT} --debug"
             }
         }
