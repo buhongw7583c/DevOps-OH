@@ -42,7 +42,10 @@ pipeline {
                 submitter "jenkins"
             }
             steps {
-                sh "cd ${CHART_DIR} && helm upgrade api-poi . --set prod.weight=50%,canary.weight=50% --reuse-values --debug"
+                script
+                {
+                    sh "cd ${CHART_DIR} && helm upgrade api-poi . --set prod.weight=50%,canary.weight=50% --reuse-values --debug"
+                }
             }
         }
     }
