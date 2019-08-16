@@ -36,13 +36,8 @@ pipeline {
             }
         }
         stage("50% Canary") {
-            input{
-                message "Do you want to distribute 50% traffic to Canary?"
-                ok "Yes, go ahead."
-                submitter "jenkins"
-            }
             steps {
-                sh "cd ${CHART_DIR}"
+                sh "cd ${CHART_DIR} && helm upgrade api-poi . --set prod.weight=50%,canary.weight=50% --reuse-values --debug"
             }
         }
     }
