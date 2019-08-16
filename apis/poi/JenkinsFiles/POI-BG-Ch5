@@ -26,6 +26,7 @@ pipeline {
         def TAG = "${params.IMAGE_TAG}"
         def CONTAINER_IMAGE_NAME = 'devopsoh/api-poi'
         def WORKING_DIR = 'apis/poi'
+        def PROD_SERVICE_NAME = 'api-poi-svc-prod'
     }
     stages {
         stage('Deploying to Kubernetes stage slot') {
