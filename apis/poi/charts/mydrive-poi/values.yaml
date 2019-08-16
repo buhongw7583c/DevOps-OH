@@ -7,7 +7,7 @@ blue:
   tag: latest
 
 green:
-  enabled: true
+  enabled: false
   tag: latest
 
 
