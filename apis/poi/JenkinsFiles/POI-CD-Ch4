@@ -30,10 +30,7 @@ pipeline {
             steps {
                 sh 'az login --service-principal -u ${AZURE_CRED_USR} -p ${AZURE_CRED_PSW} --tenant ${TENANT_ID}'
                 sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
-                sh 'kubectl create serviceaccount --namespace kube-system tiller'
-                sh 'kubectl create clusterrolebinding new-tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller'
-                sh 'kubectl patch deploy --namespace kube-system tiller-deploy -p \'{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}\''
-                sh 'helm init --service-account tiller --upgrade'
+                sh 'kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default'
                 sh "cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set repository.image=${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME},env.webServerBaseUri=http://${ENDPOINT},ingress.rules.endpoint.host=${ENDPOINT} --debug"
             }
         }
