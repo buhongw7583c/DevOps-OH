@@ -6,6 +6,7 @@ properties([
     string(name: 'AKS_RESSOURCE_GROUP', defaultValue: 'openhackug94rg'),
     string(name: 'AKS_CLUSTER_NAME', defaultValue: 'openhackug94aks'),
     string(name: 'TRAEFIK_URL', defaultValue: 'akstraefikopenhackug94.eastus.cloudapp.azure.com'),
+    string(name: 'IMAGE_TAG', defaultValue: 'latest'),
   ])
 ])
 pipeline {
@@ -22,6 +23,7 @@ pipeline {
         def AKS_RESSOURCE_GROUP = "${params.AKS_RESSOURCE_GROUP}"
         def AKS_CLUSTER_NAME = "${params.AKS_CLUSTER_NAME}"
         def ENDPOINT = "${params.TRAEFIK_URL}"
+        def TAG = "${params.IMAGE_TAG}"
         def CONTAINER_IMAGE_NAME = 'devopsoh/api-poi'
         def WORKING_DIR = 'apis/poi'
     }
@@ -30,7 +32,7 @@ pipeline {
             steps {
                 sh 'az login --service-principal -u ${AZURE_CRED_USR} -p ${AZURE_CRED_PSW} --tenant ${TENANT_ID}'
                 sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
-                sh "cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set repository.image=${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME},env.webServerBaseUri=http://${ENDPOINT},ingress.rules.endpoint.host=${ENDPOINT} --debug"
+                sh "cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set repository.image=${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME},blue.tag=${TAG},env.webServerBaseUri=http://${ENDPOINT},ingress.rules.endpoint.host=${ENDPOINT} --debug"
             }
         }
     }
