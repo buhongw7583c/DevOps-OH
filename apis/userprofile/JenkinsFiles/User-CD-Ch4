@@ -1,0 +1,39 @@
+properties([
+  parameters([
+    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'openhackug94acr.azurecr.io'),
+    string(name: 'AKS_SP_CREDENTIALS', defaultValue: 'aks-sp-credentials'),
+    string(name: 'SP_TENANT', defaultValue: '72f988bf-86f1-41af-91ab-2d7cd011db47'),
+    string(name: 'AKS_RESSOURCE_GROUP', defaultValue: 'openhackug94rg'),
+    string(name: 'AKS_CLUSTER_NAME', defaultValue: 'openhackug94aks'),
+    string(name: 'TRAEFIK_URL', defaultValue: 'akstraefikopenhackug94.eastus.cloudapp.azure.com'),
+    string(name: 'IMAGE_TAG', defaultValue: 'latest'),
+  ])
+])
+pipeline {
+    agent {
+        docker {
+            image "${params.CONTAINER_REGISTRY_SERVER}/devopsoh/nodejs:build"
+            args '-u root -v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock' 
+        }
+    }
+    environment {
+        AZURE_CRED = credentials("${params.AKS_SP_CREDENTIALS}")
+        def REGISTRY_SERVER = "${params.CONTAINER_REGISTRY_SERVER}"
+        def TENANT_ID = "${params.SP_TENANT}"
+        def AKS_RESSOURCE_GROUP = "${params.AKS_RESSOURCE_GROUP}"
+        def AKS_CLUSTER_NAME = "${params.AKS_CLUSTER_NAME}"
+        def ENDPOINT = "${params.TRAEFIK_URL}"
+        def TAG = "${params.IMAGE_TAG}"
+        def CONTAINER_IMAGE_NAME = 'devopsoh/api-user'
+        def WORKING_DIR = 'apis/userprofile'
+    }
+    stages {
+        stage('Deploying to AKS') {
+            steps {
+                sh 'az login --service-principal -u ${AZURE_CRED_USR} -p ${AZURE_CRED_PSW} --tenant ${TENANT_ID}'
+                sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
+                sh "cd ${WORKING_DIR}/charts/mydrive-user && helm upgrade api-user . --set repository.image=${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME},blue.tag=${TAG},env.webServerBaseUri=http://${ENDPOINT},ingress.rules.endpoint.host=${ENDPOINT} --debug"
+            }
+        }
+    }
+}
