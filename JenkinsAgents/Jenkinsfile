@@ -1,7 +1,7 @@
 properties([
   parameters([
-    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'h2floh.azurecr.io'),
-    string(name: 'CONTAINER_REGISTRY_JENKINS_CREDENTIALS', defaultValue: 'acr-h2floh-principal'),
+    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'poiacr.azurecr.io'),
+    string(name: 'CONTAINER_REGISTRY_JENKINS_CREDENTIALS', defaultValue: 'poi-acr-credentials'),
   ])
 ])
 
