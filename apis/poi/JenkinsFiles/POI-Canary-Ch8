@@ -1,0 +1,89 @@
+properties([
+  parameters([
+    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'openhackug94acr.azurecr.io'),
+    string(name: 'AKS_SP_CREDENTIALS', defaultValue: 'aks-sp-credentials'),
+    string(name: 'SP_TENANT', defaultValue: '72f988bf-86f1-41af-91ab-2d7cd011db47'),
+    string(name: 'AKS_RESSOURCE_GROUP', defaultValue: 'openhackug94rg'),
+    string(name: 'AKS_CLUSTER_NAME', defaultValue: 'openhackug94aks'),
+    string(name: 'TRAEFIK_URL', defaultValue: 'akstraefikopenhackug94.eastus.cloudapp.azure.com'),
+    string(name: 'IMAGE_TAG', defaultValue: 'latest'),
+  ])
+])
+pipeline {
+    agent {
+        docker {
+            image "${params.CONTAINER_REGISTRY_SERVER}/devopsoh/netcore:build"
+            args '-u root -v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock' 
+        }
+    }
+    environment {
+        AZURE_CRED = credentials("${params.AKS_SP_CREDENTIALS}")
+        def REGISTRY_SERVER = "${params.CONTAINER_REGISTRY_SERVER}"
+        def TENANT_ID = "${params.SP_TENANT}"
+        def AKS_RESSOURCE_GROUP = "${params.AKS_RESSOURCE_GROUP}"
+        def AKS_CLUSTER_NAME = "${params.AKS_CLUSTER_NAME}"
+        def ENDPOINT = "${params.TRAEFIK_URL}"
+        def TAG = "${params.IMAGE_TAG}"
+        def CONTAINER_IMAGE_NAME = 'devopsoh/api-poi'
+        def CHART_DIR = 'apis/poi/charts/mydrive-poi-canary'
+    }
+    stages {
+        stage('Staging') {
+            steps {
+                sh 'az login --service-principal -u ${AZURE_CRED_USR} -p ${AZURE_CRED_PSW} --tenant ${TENANT_ID}'
+                sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
+                sh "cd ${CHART_DIR} && helm upgrade api-poi . --set canary.enabled=true,canary.tag=${TAG} --reuse-values --debug"
+            }
+        }
+        stage("50% Canary") {
+            /*input{
+                message "Do you want to distribute 50% traffic to Canary?"
+                ok "Yes, go ahead."
+                submitter "jenkins"
+            }*/
+            steps {
+                sh "cd ${CHART_DIR} && helm upgrade api-poi . --set prod.weight=50%,canary.weight=50% --reuse-values --debug"
+            }
+        }
+        stage("100% Canary") {
+            /*input{
+                message "Do you want to distribute 100% traffic to Canary?"
+                ok "Yes, go ahead."
+                submitter "jenkins"
+            }*/
+            steps {
+                sh "cd ${CHART_DIR} && helm upgrade api-poi . --set prod.weight=0%,canary.weight=100% --reuse-values --debug"
+            }
+        }
+        stage("Set Production tag") {
+            /*input{
+                message "Do you want to set production tag?"
+                ok "Yes, go ahead."
+                submitter "jenkins"
+            }*/
+            steps {
+                sh "cd ${CHART_DIR} && helm upgrade api-poi . --set prod.tag=${TAG} --reuse-values --debug"
+            }
+        }
+        stage("100% Production") {
+            /*input{
+                message "Do you want to distribute 100% traffic to Production?"
+                ok "Yes, go ahead."
+                submitter "jenkins"
+            }*/
+            steps {
+                sh "cd ${CHART_DIR} && helm upgrade api-poi . --set prod.weight=100%,canary.weight=0% --reuse-values --debug"
+            }
+        }
+        stage("Disable Canary") {
+            /*input{
+                message "Do you want to disable Canary?"
+                ok "Yes, go ahead."
+                submitter "jenkins"
+            }*/
+            steps {
+                sh "cd ${CHART_DIR} && helm upgrade api-poi . --set canary.enabled=false --reuse-values --debug"
+            }
+        }
+    }
+}
