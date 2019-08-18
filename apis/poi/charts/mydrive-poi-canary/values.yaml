@@ -1,22 +1,22 @@
 # Default values for helmv2.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-productionSlot: blue
-blue:
+productionSlot: prod
+prod:
   enabled: true
   tag: latest
-
-green:
+  weight: 100%
+canary:
   enabled: false
   tag: latest
-
-
+  weight: 0%
 
 replicaCount: 2
 repository:
-  # Fully qualified path to image in ACR (Ex. youracr.azurecr.io/devopsoh/poi-build).
+  # Fully qualified path to image in ACR (Ex. youracr.azureacr.io/devopsoh/poi-build).
   # See deployment scripts in https://github.com/Azure-Samples/openhack-devops-proctor for example usage.
   image:
+  tag: latest
   pullPolicy: Always
 image:
   name: mydrive-poi
@@ -25,10 +25,7 @@ image:
 service:
   externalPort: 80
 ingress:
-  canarypercentage: 0%
   enabled: true
-  annotations:
-    kubernetes.io/ingress.class: traefik
   rules:
     endpoint:
       #fqdn of your exposed application (found in ohteamvalues file)
