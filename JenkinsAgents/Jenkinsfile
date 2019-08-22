@@ -1,7 +1,7 @@
 properties([
   parameters([
-    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'poiacr.azurecr.io'),
-    string(name: 'CONTAINER_REGISTRY_JENKINS_CREDENTIALS', defaultValue: 'poi-acr-credentials'),
+    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'openhackm9g8acr.azurecr.io'),
+    string(name: 'CONTAINER_REGISTRY_JENKINS_CREDENTIALS', defaultValue: 'acr-credentials'),
   ])
 ])
 
