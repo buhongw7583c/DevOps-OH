@@ -15,7 +15,7 @@ pipeline {
         CONTAINER_REG_CRED = credentials("${params.CONTAINER_REGISTRY_JENKINS_CREDENTIALS}")
         def REGISTRY_SERVER = "${params.CONTAINER_REGISTRY_SERVER}"
         def CONTAINER_IMAGE_NAME = 'devopsoh/trips-poi'
-        def CONTAINER_IMAGE_LABEL = "jenkins:${env.BUILD_ID}"
+        def CONTAINER_IMAGE_LABEL = "jenkins-${env.BUILD_ID}"
         def WORKING_DIR = 'apis/trips'
     }
     stages {
