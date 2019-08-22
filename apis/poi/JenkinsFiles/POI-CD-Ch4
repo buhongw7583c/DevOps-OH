@@ -1,11 +1,11 @@
 properties([
   parameters([
-    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'poiacr.azurecr.io'),
-    string(name: 'AKS_SP_CREDENTIALS', defaultValue: 'aks-sp-credentials'),
-    string(name: 'SP_TENANT', defaultValue: '72f988bf-86f1-41af-91ab-2d7cd011db47'),
-    string(name: 'AKS_RESSOURCE_GROUP', defaultValue: 'openhackug94rg'),
-    string(name: 'AKS_CLUSTER_NAME', defaultValue: 'openhackug94aks'),
-    string(name: 'TRAEFIK_URL', defaultValue: 'akstraefikopenhackug94.eastus.cloudapp.azure.com'),
+    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'openhackm9g8acr.azurecr.io'),
+    string(name: 'AKS_SP_CREDENTIALS', defaultValue: 'acr-credentials'),
+    string(name: 'SP_TENANT', defaultValue: 'd303113d-db05-4b98-938e-b5ef3f6da08a'),
+    string(name: 'AKS_RESSOURCE_GROUP', defaultValue: 'openhackm9g8rg'),
+    string(name: 'AKS_CLUSTER_NAME', defaultValue: 'openhackm9g8aks'),
+    string(name: 'TRAEFIK_URL', defaultValue: 'akstraefikopenhackm9g8.eastus.cloudapp.azure.com'),
     string(name: 'IMAGE_TAG', defaultValue: 'latest'),
   ])
 ])
