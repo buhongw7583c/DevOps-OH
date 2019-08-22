@@ -1,6 +1,6 @@
 properties([
   parameters([
-    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'openhackug94acr.azurecr.io'),
+    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'openhackm9g8acr.azurecr.io'),
   ])
 ])
 pipeline {
@@ -14,11 +14,6 @@ pipeline {
         def WORKING_DIR = 'apis/poi'
     }
     stages {
-        stage('Build') { 
-            steps {
-                sh 'cd ${WORKING_DIR}/web && dotnet build' 
-            }
-        }
         stage('Test') {
             steps {
                 sh 'cd ${WORKING_DIR}/tests/UnitTests && dotnet test'
