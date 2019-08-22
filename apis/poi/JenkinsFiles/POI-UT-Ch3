@@ -15,6 +15,7 @@ pipeline {
         CONTAINER_REG_CRED = credentials("${params.CONTAINER_REGISTRY_JENKINS_CREDENTIALS}")
         def REGISTRY_SERVER = "${params.CONTAINER_REGISTRY_SERVER}"
         def WORKING_DIR = 'apis/poi'
+    }
     stages {
         stage('Test') {
             steps {
