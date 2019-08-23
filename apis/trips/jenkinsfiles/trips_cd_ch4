@@ -12,7 +12,7 @@ properties([
 pipeline {
     agent {
         docker {
-            image "${params.CONTAINER_REGISTRY_SERVER}/devopsoh/netcore:build"
+            image "${params.CONTAINER_REGISTRY_SERVER}/devopsoh/go:build"
             args '-u root -v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock' 
         }
     }
@@ -24,15 +24,15 @@ pipeline {
         def AKS_CLUSTER_NAME = "${params.AKS_CLUSTER_NAME}"
         def ENDPOINT = "${params.TRAEFIK_URL}"
         def TAG = "${params.IMAGE_TAG}"
-        def CONTAINER_IMAGE_NAME = 'devopsoh/api-poi'
-        def WORKING_DIR = 'apis/poi'
+        def CONTAINER_IMAGE_NAME = 'devopsoh/api-trip'
+        def WORKING_DIR = 'apis/trips'
     }
     stages {
         stage('Deploying to AKS') {
             steps {
                 sh 'az login --service-principal -u ${AZURE_CRED_USR} -p ${AZURE_CRED_PSW} --tenant ${TENANT_ID}'
                 sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
-                sh "cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set repository.image=${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME},blue.tag=${TAG},env.webServerBaseUri=http://${ENDPOINT},ingress.rules.endpoint.host=${ENDPOINT} --debug"
+                sh "cd ${WORKING_DIR}/charts/mydrive-trips && helm upgrade api-trips . --set repository.image=${REGISTRY_SERVER}/${CONTAINER_IMAGE_NAME},blue.tag=${TAG},env.webServerBaseUri=http://${ENDPOINT},ingress.rules.endpoint.host=${ENDPOINT} --debug"
             }
         }
     }
