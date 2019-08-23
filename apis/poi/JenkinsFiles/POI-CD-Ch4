@@ -5,7 +5,7 @@ properties([
     string(name: 'SP_TENANT', defaultValue: 'd303113d-db05-4b98-938e-b5ef3f6da08a'),
     string(name: 'AKS_RESSOURCE_GROUP', defaultValue: 'openhackm9g8rg'),
     string(name: 'AKS_CLUSTER_NAME', defaultValue: 'openhackm9g8aks'),
-    string(name: 'TRAEFIK_URL', defaultValue: 'akstraefikopenhackm9g8.eastus.cloudapp.azure.com'),
+    string(name: 'TRAEFIK_URL', defaultValue: 'akstraefikopenhackm9g8.eastasia.cloudapp.azure.com'),
     string(name: 'IMAGE_TAG', defaultValue: 'latest'),
   ])
 ])
