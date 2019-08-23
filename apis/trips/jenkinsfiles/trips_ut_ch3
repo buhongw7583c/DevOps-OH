@@ -20,7 +20,7 @@ pipeline {
         stage('Test') {
             steps {
                 sh 'docker login -p ${CONTAINER_REG_CRED_PSW} -u ${CONTAINER_REG_CRED_USR} ${REGISTRY_SERVER}' 
-                sh 'cd ${WORKING_DIR}/tests/ && go test'
+                sh 'cd ${WORKING_DIR}/tests/ && go test ./tests'
             }
         }
     }
