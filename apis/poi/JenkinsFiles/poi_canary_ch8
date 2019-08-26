@@ -32,7 +32,7 @@ pipeline {
             steps {
                 sh 'az login --service-principal -u ${AZURE_CRED_USR} -p ${AZURE_CRED_PSW} --tenant ${TENANT_ID}'
                 sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
-                sh "cd ${CHART_DIR} && helm upgrade api-poi . --set canary.enabled=true,canary.tag=${TAG}, prod.weight=0%,canary.weight=100% --reuse-values --debug"
+                sh "cd ${CHART_DIR} && helm upgrade api-poi . --set canary.enabled=true,canary.tag=${TAG} --set prod.weight=0%,canary.weight=100% --reuse-values --debug"
             }
         }
         stage("50% Canary") {
