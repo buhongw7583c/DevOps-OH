@@ -1,0 +1,61 @@
+properties([
+  parameters([
+    string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'openhackm9g8acr.azurecr.io'),
+    string(name: 'AKS_SP_CREDENTIALS', defaultValue: 'acr-aks_sp'),
+    string(name: 'SP_TENANT', defaultValue: 'd303113d-db05-4b98-938e-b5ef3f6da08a'),
+    string(name: 'AKS_RESSOURCE_GROUP', defaultValue: 'openhackm9g8rg'),
+    string(name: 'AKS_CLUSTER_NAME', defaultValue: 'openhackm9g8aks'),
+    string(name: 'TRAEFIK_URL', defaultValue: 'akstraefikopenhackm9g8.eastasia.cloudapp.azure.com'),
+    string(name: 'IMAGE_TAG', defaultValue: 'latest'),
+  ])
+])
+pipeline {
+    agent {
+        docker {
+            image "${params.CONTAINER_REGISTRY_SERVER}/devopsoh/netcore:build"
+            args '-u root -v /root/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock' 
+        }
+    }
+    environment {
+        AZURE_CRED = credentials("${params.AKS_SP_CREDENTIALS}")
+        def REGISTRY_SERVER = "${params.CONTAINER_REGISTRY_SERVER}"
+        def TENANT_ID = "${params.SP_TENANT}"
+        def AKS_RESSOURCE_GROUP = "${params.AKS_RESSOURCE_GROUP}"
+        def AKS_CLUSTER_NAME = "${params.AKS_CLUSTER_NAME}"
+        def ENDPOINT = "${params.TRAEFIK_URL}"
+        def TAG = "${params.IMAGE_TAG}"
+        def CONTAINER_IMAGE_NAME = 'devopsoh/api-poi'
+        def WORKING_DIR = 'apis/poi'
+        def PROD_SERVICE_NAME = 'api-poi-svc-prod'
+    }
+    stages {
+        stage('Deploying to Kubernetes stage slot') {
+            steps {
+                sh 'az login --service-principal -u ${AZURE_CRED_USR} -p ${AZURE_CRED_PSW} --tenant ${TENANT_ID}'
+                sh 'az aks get-credentials --resource-group ${AKS_RESSOURCE_GROUP} --name ${AKS_CLUSTER_NAME}'
+                script 
+                {
+                    def CURR_PROD_SLOT = sh(script: 'kubectl get svc -o jsonpath="{.spec.selector.slot}" ${PROD_SERVICE_NAME}', returnStdout: true).trim()
+                    def DEPLOYMENT_SLOT = sh(script: "if [ \\\"blue\\\" == \\\"${CURR_PROD_SLOT}\\\" ]; then echo green; else echo blue; fi;", returnStdout: true).trim()
+                    sh "cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set ${DEPLOYMENT_SLOT}.enabled=true,${DEPLOYMENT_SLOT}.tag=${TAG} --reuse-values --debug"
+                }
+            }
+        }
+        stage("Switching Traefik to use deployment slot as new Production") {
+            input{
+                message "Do you want to proceed for production deployment?"
+                ok "Yes, go ahead."
+                submitter "jenkins"
+            }
+            steps {
+                script
+                {
+                    def CURR_PROD_SLOT = sh(script: 'kubectl get svc -o jsonpath="{.spec.selector.slot}" ${PROD_SERVICE_NAME}', returnStdout: true).trim()
+                    def DEPLOYMENT_SLOT = sh(script: "if [ \\\"blue\\\" == \\\"${CURR_PROD_SLOT}\\\" ]; then echo green; else echo blue; fi;", returnStdout: true).trim()
+                    sh "cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set productionSlot=${DEPLOYMENT_SLOT} --reuse-values"
+                    sh "cd ${WORKING_DIR}/charts/mydrive-poi && helm upgrade api-poi . --set ${CURR_PROD_SLOT}.enabled=false --reuse-values"
+                }
+            }
+        }
+    }
+}
