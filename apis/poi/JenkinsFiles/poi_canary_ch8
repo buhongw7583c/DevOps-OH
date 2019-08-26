@@ -36,7 +36,7 @@ pipeline {
             }
         }
         stage("50% Canary") {
-            {
+            input{
                 message "Do you want to distribute 50% traffic to Canary?"
                 ok "Yes, go ahead."
                 submitter "jenkins"
@@ -46,7 +46,7 @@ pipeline {
             }
         }
         stage("100% Canary") {
-            {
+            input{
                 message "Do you want to distribute 100% traffic to Canary?"
                 ok "Yes, go ahead."
                 submitter "jenkins"
@@ -56,7 +56,7 @@ pipeline {
             }
         }
         stage("Set Production tag") {
-            {
+            input{
                 message "Do you want to set production tag?"
                 ok "Yes, go ahead."
                 submitter "jenkins"
@@ -66,7 +66,7 @@ pipeline {
             }
         }
         stage("100% Production") {
-            {
+            input{
                 message "Do you want to distribute 100% traffic to Production?"
                 ok "Yes, go ahead."
                 submitter "jenkins"
@@ -76,7 +76,7 @@ pipeline {
             }
         }
         stage("Disable Canary") {
-            {
+            input{
                 message "Do you want to disable Canary?"
                 ok "Yes, go ahead."
                 submitter "jenkins"
