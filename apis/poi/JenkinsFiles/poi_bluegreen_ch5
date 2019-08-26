@@ -1,7 +1,7 @@
 properties([
   parameters([
     string(name: 'CONTAINER_REGISTRY_SERVER', defaultValue: 'openhackm9g8acr.azurecr.io'),
-    string(name: 'AKS_SP_CREDENTIALS', defaultValue: 'acr-aks_sp'),
+    string(name: 'AKS_SP_CREDENTIALS', defaultValue: 'aks_sp'),
     string(name: 'SP_TENANT', defaultValue: 'd303113d-db05-4b98-938e-b5ef3f6da08a'),
     string(name: 'AKS_RESSOURCE_GROUP', defaultValue: 'openhackm9g8rg'),
     string(name: 'AKS_CLUSTER_NAME', defaultValue: 'openhackm9g8aks'),
