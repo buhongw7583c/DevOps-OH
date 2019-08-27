@@ -70,17 +70,17 @@ pipeline {
                 message "Do you want to distribute 100% traffic to Production?"
                 ok "Yes, go ahead."
                 submitter "jenkins"
-            }
+            }*/
             steps {
                 sh "cd ${CHART_DIR} && helm upgrade api-poi . --set prod.weight=100%,canary.weight=0% --reuse-values --debug"
-            }*/
+            }
         }
         stage("Disable Canary") {
-            input{
+            /*input{
                 message "Do you want to disable Canary?"
                 ok "Yes, go ahead."
                 submitter "jenkins"
-            }
+            }*/
             steps {
                 sh "cd ${CHART_DIR} && helm upgrade api-poi . --set canary.enabled=false --reuse-values --debug"
             }
