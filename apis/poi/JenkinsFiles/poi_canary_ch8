@@ -55,7 +55,8 @@ pipeline {
             steps {
                 sh "cd ${CHART_DIR} && helm upgrade api-poi . --set prod.weight=0%,canary.weight=100% --reuse-values --debug"
             }
-        }
+        }*/
+        /*
         stage("Set Production tag") {
             /*input{
                 message "Do you want to set production tag?"
@@ -65,7 +66,8 @@ pipeline {
             steps {
                 sh "cd ${CHART_DIR} && helm upgrade api-poi . --set prod.tag=${TAG} --reuse-values --debug"
             }
-        }
+        }*/
+        /*
         stage("100% Production") {
             /*input{
                 message "Do you want to distribute 100% traffic to Production?"
@@ -75,7 +77,8 @@ pipeline {
             steps {
                 sh "cd ${CHART_DIR} && helm upgrade api-poi . --set prod.weight=100%,canary.weight=0% --reuse-values --debug"
             }
-        }
+        }*/
+        /*
         stage("Disable Canary") {
             /*input{
                 message "Do you want to disable Canary?"
@@ -85,7 +88,6 @@ pipeline {
             steps {
                 sh "cd ${CHART_DIR} && helm upgrade api-poi . --set canary.enabled=false --reuse-values --debug"
             }
-        }
-        */
+        } */
     }
 }
