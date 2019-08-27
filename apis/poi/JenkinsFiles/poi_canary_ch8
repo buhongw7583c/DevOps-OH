@@ -45,6 +45,7 @@ pipeline {
                 sh "cd ${CHART_DIR} && helm upgrade api-poi . --set prod.weight=50%,canary.weight=50% --reuse-values --debug"
             }
         }
+        /*
         stage("100% Canary") {
             /*input{
                 message "Do you want to distribute 100% traffic to Canary?"
@@ -85,5 +86,6 @@ pipeline {
                 sh "cd ${CHART_DIR} && helm upgrade api-poi . --set canary.enabled=false --reuse-values --debug"
             }
         }
+        */
     }
 }
